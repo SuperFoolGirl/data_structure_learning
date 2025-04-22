@@ -20,9 +20,9 @@ public:
         delete[] objects;
     }
 
-    const Vector &operator=(const Vector &rhs)
+    Vector &operator=(const Vector &rhs) // 重载运算符函数返回类型大多数是引用。没必要常量引用
     {
-        if (this != &rhs)
+        if (this != &rhs) // 自赋值判断
         {
             delete[] objects;
             theSize = rhs.theSize;
@@ -93,6 +93,7 @@ public:
         return objects[theSize - 1];
     }
 
+    // 迭代器用指针实现
     typedef Object *iterator;
     typedef const Object *const_iterator;
 

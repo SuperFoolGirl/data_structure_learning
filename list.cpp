@@ -5,6 +5,7 @@ template <typename Object>
 class List
 {
 private:
+    // 封装了指针节点作为成员变量
     struct Node
     {
         Object data;
@@ -15,6 +16,13 @@ private:
     };
 
 public:
+    // 相比vector list类的迭代器是通过嵌套类实现的，不再是简单用指针
+    // 根据面向对象的思想，我们所需要的东西，都可以把它封装成一个类
+
+    // 嵌套类作用：
+    // 1. 控制外部访问权限
+    // 2. 内部类可访问外部类的私有成员（如果两个类分开写的话，那不能直接访问私有成员，还需要友元声明）（反过来不行）
+    // 3. 命名空间管理
     class const_iterator
     {
     public:
@@ -32,11 +40,11 @@ public:
         const_iterator &operator++(int)
         {
             const_iterator old = *this; // this指向的是const_iterator这个类 两边类型是相同的
-            ++(*this);
+            ++(*this); // 调用前置++
             return old; // old此时还是传进来的那个对象 不过对象的
         }
 
-        bool operator==(const const_iterator &rhs) const
+        bool operator==(const const_iterator &rhs) const // 比较地址
         {
             return current == rhs.current;
         }
@@ -45,17 +53,22 @@ public:
             return !(*this == rhs);
         }
 
-    protected: // 允许继承者访问成员 其他类不允许
+    protected:
         Node *current;
         Object &retrieve() const
         {
             return current->data;
         }
+        // 外界不允许调用有参构造函数
         const_iterator(Node *p) : current(p) {}
 
-        friend class List<Object>;
+        friend class List<Object>; // 友元声明可以写在类的任何地方。朋友函数可以访问protected和private成员
+        // 但友元声明不具备继承性，派生类还需要单独进行友元声明
     };
 
+    // 迭代器类继承自const_iterator类，增加了对数据的修改功能。
+    // 因为是增加了功能，所以它是作为派生类的。
+    // 粗略来说，基类是派生类的子集。
     class iterator : public const_iterator
     {
     public:
@@ -84,13 +97,14 @@ public:
     protected:
         iterator(Node *p) : const_iterator(p) {} // 这里初始化列表还可以写函数
 
+        // 注意，外部类不可访问内部类的私有成员，所以需要友元声明
         friend class List<Object>; // List可访问iterator的私有成员
     };
 
 public:
     List()
     {
-        init();
+        init(); // 这个函数外界不允许访问，因此放到private
     }
 
     ~List()
@@ -100,10 +114,11 @@ public:
         delete tail;
     }
 
+    // 拷贝构造不需要判断自赋值，直接调用init清除栈区对象数据即可
     List(const List &rhs)
     {
-        init(); // ？
-        *this = rhs;
+        init();
+        *this = rhs; // 注意 这里是重载赋值运算符，是深拷贝
     }
 
     const List &operator=(const List &rhs)
