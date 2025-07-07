@@ -46,7 +46,7 @@ public:
         }
 
         bool operator!=(const const_iterator &rhs) const {
-            return !(*this == rhs);
+            return !(*this == rhs);    // 直接调用上面的==运算符，注意传参传的是迭代器对象
         }
 
     protected:
@@ -107,8 +107,9 @@ public:
         delete tail;
     }
 
-    // 拷贝构造不需要判断自赋值，直接调用init清除栈区对象数据即可
     List(const List &rhs) {
+        // 拷贝构造是从无到有的过程。此时，对于调用拷贝构造的这个对象来说，它没有任何成员变量，因此也没有堆区数据
+        // 因此需要先调用init函数初始化头尾哨兵
         init();
         *this = rhs;    // 注意 这里是重载赋值运算符，是深拷贝
     }
