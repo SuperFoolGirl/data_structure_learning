@@ -25,6 +25,13 @@ struct Graph {
 
 std::vector<bool> visited(MAX_SIZE);           // 访问标记数组
 
+// 重置访问标记数组
+void resetVisited() {
+    for (int i = 0; i < visited.size(); ++i) {
+        visited[i] = false;    // 重置访问标记数组
+    }
+}
+
 // 该函数用于创建一个特定的图，这里没有给出通用的创建方法。本例中的图也是特定的，仅供参考
 // 本图为带权无向图
 void createGraph(Graph *g) {
@@ -216,21 +223,125 @@ void kruskal(Graph *g) {
     }
 }
 
-// 最短路径dijkstra算法
+// 最短路径 dijkstra算法
+// Dijkstra算法：从起点开始，逐步扩展到所有顶点，找到最短路径
+// 注意：Dijkstra算法只能用于非负权图，且不能处理负权边
+// 优先队列
 void dijkstra(Graph *g) {
+    std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;    // 最小堆
+    std::vector<int> dist(g->vertex_num, MAX);     // 初始化距离数组，初始值为最大值
+    std::vector<int> parent(g->vertex_num, -1);    // 记录前驱节点，用于最后输出路径
+    int start = 0;                                 // 起点索引，这里假设从顶点A开始
+    dist[start] = 0;                               // 起点到自己的距离为0
+    pq.push({0, start});                           // 将起点加入优先队列，
+    // 优先队列中的元素是一个pair，第一个元素是距离，第二个元素是顶点索引
+    // curr代表当前处理的顶点，next是下一步待扩展的顶点
+    while (!pq.empty()) {
+        int curr = pq.top().second;    // 获取当前距离最小的顶点
+        pq.pop();
 
+        if (visited[curr]) {
+            continue;    // 如果已经访问过，跳过
+        }
+
+        // 标记为已访问。把它放在这，而不是下面的for循环里
+        // 处理每个出队的顶点时，统一处理其访问属性，而不是尝试拓展时就处理
+        // 这种微妙的思想值得体会一下
+        visited[curr] = true;
+
+        // 遍历所有邻接顶点
+        for (int next = 0; next < g->vertex_num; ++next) {
+            if (g->arc[curr][next] != 0 && g->arc[curr][next] != MAX) {    // 如果有边且不是最大值
+                int new_dist = dist[curr] + g->arc[curr][next];            // 计算新距离
+                if (new_dist < dist[next]) {                               // 如果新距离小于原距离
+                    dist[next] = new_dist;                                 // 更新距离
+                    parent[next] = curr;                                   // 更新前驱节点
+                    pq.push({new_dist, next});                             // 将新距离和顶点加入优先队列
+                }
+            }
+        }
+    }
+
+    // 输出最短路径
+    for (int i = 1; i < g->vertex_num; ++i) {
+        if (dist[i] == MAX) {
+            printf("Vertex %c is unreachable from %c\n", g->vertex[i], g->vertex[start]);
+        } else {
+            printf("Shortest path from %c to %c is %d\n", g->vertex[start], g->vertex[i], dist[i]);
+            // 输出路径
+            printf("Path: ");
+            int j = i;
+            while (j != -1) {
+                printf("%c ", g->vertex[j]);
+                j = parent[j];    // 回溯前驱节点，想象一个串联的结构
+            }
+            printf("\n");
+        }
+    }
 }
 
-// 重置访问标记数组
-void resetVisited() {
-    for (int i = 0; i < visited.size(); ++i) {
-        visited[i] = false;    // 重置访问标记数组
+// 最短路径 Floyd算法
+// Floyd算法：计算所有顶点对之间的最短路径，适用于有向图和负权边，但不能处理负权环
+// 相比于Dijkstra算法，Floyd算法更通用，打破了起点固定和负边权的限制，但时间复杂度较高
+// 简单讲一下算法：
+// 1. 准备dist数组，dist[i][j]表示从顶点i到顶点j的最短路径。初始化为临界矩阵即可
+// 2. 准备path数组，path[i][j]表示从顶点i到顶点j这条路径上，j的前驱节点。
+// 3. 对于图中的每个顶点，依次以它为中间点，更新dist数组和path数组
+// 4. 以顶点k为中间点，k行k列以及主对角线不需要动，其他行列更新为以k为中间点的最短路径
+// 5. 最终dist数组中存储了所有顶点对之间的最短路径，path数组中存储了前驱节点信息。根据path一步步回溯即可得到路径
+void floyd(Graph *g) {
+    int dist[MAX_SIZE][MAX_SIZE];    // 最短路径矩阵
+    int path[MAX_SIZE][MAX_SIZE];    // 前驱节点矩阵
+
+    // 初始化dist和path矩阵
+    for (int i = 0; i < g->vertex_num; ++i) {
+        for (int j = 0; j < g->vertex_num; ++j) {
+            dist[i][j] = g->arc[i][j];                         // 初始化最短路径矩阵为临界矩阵
+            if (g->arc[i][j] != MAX && g->arc[i][j] != 0) {    // 0也是非法边权，即自反边
+                // 如果有边，前驱节点为起点。注意，根据邻接矩阵得来的dist数组，i到j的路径是直接的，i就是前驱节点
+                path[i][j] = i;
+            } else {
+                path[i][j] = -1;    // 如果没有边，前驱节点为-1，表示不可达
+            }
+        }
+    }
+
+    // Floyd算法核心逻辑
+    // 类比一下动态规划，dist[i][j]表示从i到j的最短路径，中间经历的点是不考虑的，或者说抽象处理的
+    for (int k = 0; k < g->vertex_num; ++k) {                // 中间点
+        for (int i = 0; i < g->vertex_num; ++i) {            // 起点
+            for (int j = 0; j < g->vertex_num; ++j) {        // 终点
+                if (dist[i][k] != MAX && dist[k][j] != MAX && dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];    // 更新最短路径
+                    path[i][j] = path[k][j];                 // 更新前驱节点
+                }
+            }
+        }
+    }
+
+    // 输出最短路径和前驱节点信息
+    for (int i = 0; i < g->vertex_num; ++i) {
+        for (int j = 0; j < g->vertex_num; ++j) {
+            if (dist[i][j] == MAX) {
+                printf("Vertex %c to %c is unreachable\n", g->vertex[i], g->vertex[j]);
+            } else {
+                printf("Shortest path from %c to %c is %d\n", g->vertex[i], g->vertex[j], dist[i][j]);
+                // 输出路径
+                printf("Path: ");
+                int k = j;
+                while (k != -1) {
+                    printf("%c ", g->vertex[k]);
+                    k = path[i][k];    // 回溯前驱节点
+                }
+                printf("\n");
+            }
+        }
     }
 }
 
 int main() {
     Graph g;
     createGraph(&g);
-    kruskal(&g);    // 使用Kruskal算法生成最小生成树
+    floyd(&g);    // 调用Floyd算法计算最短路径
     return 0;
 }
