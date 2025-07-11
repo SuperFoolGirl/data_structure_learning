@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <cstdio>
 #include <queue>
+#include <stack>
 #include <vector>
 
 #define MAX_SIZE 100
@@ -9,10 +10,11 @@
 typedef char VertexType;    // 顶点类型
 typedef int EdgeType;       // 边类型
 
+// 边结点1
 struct Edge {
-    int start;              // 起点
-    int end;                // 终点
-    EdgeType weight;        // 权重
+    int start;          // 起点
+    int end;            // 终点
+    EdgeType weight;    // 权重
 };
 
 struct Graph {
@@ -25,10 +27,54 @@ struct Graph {
 
 std::vector<bool> visited(MAX_SIZE);           // 访问标记数组
 
+// 边结点2（用于邻接表）
+struct EdgeNode {
+    int edge_vex;    // 一条邻接表中顶点的序号
+    int weight;      // 权重
+    EdgeNode *next;
+};
+
+// 顶点结点，用于邻接表表头
+struct VertexNode {
+    int in;             // 入度
+    VertexType data;    // 顶点数据
+    EdgeNode *head;     // 指向边结点的指针
+};
+
+// 邻接表结构体
+struct AdjGraph {
+    VertexNode adj_list[MAX_SIZE];    // 顶点数组，即二维链表
+    int vertex_num;                   // 顶点数
+    int edge_num;                     // 边数
+};
+
 // 重置访问标记数组
 void resetVisited() {
     for (int i = 0; i < visited.size(); ++i) {
         visited[i] = false;    // 重置访问标记数组
+    }
+}
+
+void createAdjGraph(Graph *g, AdjGraph *adj_g) {
+    adj_g->vertex_num = g->vertex_num;
+    adj_g->edge_num = g->edge_num;
+
+    for (int i = 0; i < adj_g->vertex_num; ++i) {
+        adj_g->adj_list[i].in = 0;                 // 初始化入度为0
+        adj_g->adj_list[i].data = g->vertex[i];    // 设置顶点数据，每个顶点都要做链表表头
+        adj_g->adj_list[i].head = nullptr;         // 初始化边结点指针为空
+    }
+
+    // 遍历边数组，将边添加到邻接表中
+    for (const auto &e : g->edge) {
+        // 创建新的边结点
+        EdgeNode *new_edge = new EdgeNode;
+        new_edge->edge_vex = e.end;     // 设置边结点的顶点序号
+        new_edge->weight = e.weight;    // 设置边结点的权重
+        // 实质是头插法
+        new_edge->next = adj_g->adj_list[e.start].head;    // 将新边结点插入到表头。这里命名head有些许歧义
+        adj_g->adj_list[e.start].head = new_edge;          // 更新表头指针
+        adj_g->adj_list[e.end].in++;                       // 更新终点的入度
     }
 }
 
@@ -308,12 +354,12 @@ void floyd(Graph *g) {
 
     // Floyd算法核心逻辑
     // 类比一下动态规划，dist[i][j]表示从i到j的最短路径，中间经历的点是不考虑的，或者说抽象处理的
-    for (int k = 0; k < g->vertex_num; ++k) {                // 中间点
-        for (int i = 0; i < g->vertex_num; ++i) {            // 起点
-            for (int j = 0; j < g->vertex_num; ++j) {        // 终点
-                if (dist[i][k] != MAX && dist[k][j] != MAX && dist[i][k] + dist[k][j] < dist[i][j]) {
-                    dist[i][j] = dist[i][k] + dist[k][j];    // 更新最短路径
-                    path[i][j] = path[k][j];                 // 更新前驱节点
+    for (int mid = 0; mid < g->vertex_num; ++mid) {              // 中间点
+        for (int i = 0; i < g->vertex_num; ++i) {                // 起点
+            for (int j = 0; j < g->vertex_num; ++j) {            // 终点
+                if (dist[i][mid] != MAX && dist[mid][j] != MAX && dist[i][mid] + dist[mid][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][mid] + dist[mid][j];    // 更新最短路径
+                    path[i][j] = path[mid][j];                   // 更新前驱节点
                 }
             }
         }
@@ -339,9 +385,124 @@ void floyd(Graph *g) {
     }
 }
 
+// 拓扑排序
+// 用于有向无环图，基于AOV网——用顶点表示活动，用弧表示活动之间的优先级，这样的有向图为顶点表示活动的网
+// 每次选择入度为0的顶点，将其加入结果序列，并删除该顶点及其出边，直到所有顶点都被处理
+// 如果遇到环，则无法进行拓扑排序
+// 代码中，需要把邻接矩阵转为邻接表
+void topologicalSort(AdjGraph *g) {
+    std::stack<int> s;                   // 用栈来存储入度为0的顶点
+    for (int i = 0; i < g->vertex_num; ++i) {
+        if (g->adj_list[i].in == 0) {    // 如果入度为0，入栈
+            s.push(i);
+        }
+    }
+
+    while (!s.empty()) {
+        int curr = s.top();
+        s.pop();
+        printf("%c ", g->adj_list[curr].data);    // 访问顶点
+        EdgeNode *e = g->adj_list[curr].head;     // 获取当前顶点的边结点
+
+        // 遍历当前顶点的所有出边，即遍历一条邻接表
+        // 所有出边的入度都减1，且入度为0的顶点入栈
+        while (e != nullptr) {
+            int next = e->edge_vex;             // 获取下一个顶点，即当前边的终点
+            g->adj_list[next].in--;             // 入度减1
+            if (g->adj_list[next].in == 0) {    // 如果入度为0，入栈
+                s.push(next);
+            }
+            e = e->next;                        // 移动到下一个边结点
+        }
+    }
+}
+
+// 关键路径
+// 从前往后推：事件最早发生时间，岔路取最大值
+// 从后往前推：事件最晚发生时间，岔路取最小值
+// 关键路径求法1：取事件最早发生时间和最晚发生时间相等的结点，连接成路径
+// 这个求法有两种实现：动态规划或者栈
+// 关键路径求法2：从起点到终点的最长路径，表示完成整个工程所需的最短时间
+// 从上述两个方法可以看出，关键路径不一定会遍历所有顶点
+
+// 关键路径上的活动称为关键活动，关键活动的延误会导致整个工程的延误
+// 在一个表示工程的带权有向图中，用顶点表示事件，用有向边表示活动，用边上的权值表示活动持续事件，称为AOE网（带权值的图也被称为网）
+// 拓扑排序仅能体现做事的优先级，但不能体现做事的时间，关键路径则可以
+void criticalPath(AdjGraph *g) {
+    // 过程中用的拓扑排序
+    std::stack<int> s1;
+    std::stack<int> s2;
+    int earliest[MAX_SIZE];    // 最早发生时间
+    int latest[MAX_SIZE];      // 最晚发生时间
+
+    for (int i = 0; i < g->vertex_num; ++i) {
+        if (g->adj_list[i].in == 0) {    // 入度为0的顶点入栈
+            s1.push(i);
+        }
+    }
+    for (int i = 0; i < g->vertex_num; ++i) {
+        earliest[i] = 0;    // 初始化最早发生时间为0
+        latest[i] = MAX;    // 初始化最晚发生时间为最大值
+    }
+
+    while (!s1.empty()) {
+        int curr = s1.top();
+        s1.pop();
+        printf("%c\n", g->adj_list[curr].data); // 拓扑排序输出
+        s2.push(curr);    // 将当前顶点入栈，后续用于逆序处理
+
+        EdgeNode *e = g->adj_list[curr].head;    // 获取当前顶点的边结点
+        while (e != nullptr) {
+            int next = e->edge_vex;    // 获取下一个顶点
+            earliest[next] = std::max(earliest[next], earliest[curr] + e->weight);    // 更新最早发生时间
+            g->adj_list[next].in--;    // 入度减1
+            if (g->adj_list[next].in == 0) {    // 如果入度为0，入栈
+                s1.push(next);
+            }
+            e = e->next;    // 移动到下一个边结点
+        }
+
+        // 输出最早发生时间
+        for (int i = 0; i < g->vertex_num; ++i) {
+            printf("Earliest time for %c: %d\n", g->adj_list[i].data, earliest[i]);
+        }
+
+        // 初始化最晚发生时间
+        for (int i = 0; i < g->vertex_num; ++i) {
+            latest[i] = earliest[g->vertex_num - 1];    // 最后一个顶点的最晚发生时间为最早发生时间
+        }
+
+        while (!s2.empty()) {
+            int curr = s2.top();
+            s2.pop();
+            EdgeNode *e = g->adj_list[curr].head;    // 获取当前顶点的边结点
+            while (e != nullptr) {
+                int next = e->edge_vex;    // 获取下一个顶点
+                latest[curr] = std::min(latest[curr], latest[next] - e->weight);    // 更新最晚发生时间
+                e = e->next;               // 移动到下一个边结点
+            }
+        }
+
+        // 输出最晚发生时间
+        for (int i = 0; i < g->vertex_num; ++i) {
+            printf("Latest time for %c: %d\n", g->adj_list[i].data, latest[i]);
+        }
+
+        // 输出关键路径
+        printf("Critical Path: ");
+        for (int i = 0; i < g->vertex_num; ++i) {
+            if (earliest[i] == latest[i]) {    // 如果最早发生时间和最晚发生时间相等，说明是关键活动
+                printf("%c ", g->adj_list[i].data);
+            }
+        }
+    }
+}
+
 int main() {
     Graph g;
     createGraph(&g);
-    floyd(&g);    // 调用Floyd算法计算最短路径
+    AdjGraph adj_g;
+    createAdjGraph(&g, &adj_g);    // 创建邻接表
+    criticalPath(&adj_g);
     return 0;
 }
