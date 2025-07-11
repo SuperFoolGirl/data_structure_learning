@@ -432,8 +432,8 @@ void criticalPath(AdjGraph *g) {
     // 过程中用的拓扑排序
     std::stack<int> s1;
     std::stack<int> s2;
-    int earliest[MAX_SIZE];    // 最早发生时间
-    int latest[MAX_SIZE];      // 最晚发生时间
+    int earliest[MAX_SIZE];              // 最早发生时间
+    int latest[MAX_SIZE];                // 最晚发生时间
 
     for (int i = 0; i < g->vertex_num; ++i) {
         if (g->adj_list[i].in == 0) {    // 入度为0的顶点入栈
@@ -448,18 +448,18 @@ void criticalPath(AdjGraph *g) {
     while (!s1.empty()) {
         int curr = s1.top();
         s1.pop();
-        printf("%c\n", g->adj_list[curr].data); // 拓扑排序输出
-        s2.push(curr);    // 将当前顶点入栈，后续用于逆序处理
+        printf("%c\n", g->adj_list[curr].data);    // 拓扑排序输出
+        s2.push(curr);                             // 将当前顶点入栈，后续用于逆序处理
 
-        EdgeNode *e = g->adj_list[curr].head;    // 获取当前顶点的边结点
+        EdgeNode *e = g->adj_list[curr].head;      // 获取当前顶点的边结点
         while (e != nullptr) {
-            int next = e->edge_vex;    // 获取下一个顶点
+            int next = e->edge_vex;                // 获取下一个顶点
             earliest[next] = std::max(earliest[next], earliest[curr] + e->weight);    // 更新最早发生时间
-            g->adj_list[next].in--;    // 入度减1
-            if (g->adj_list[next].in == 0) {    // 如果入度为0，入栈
+            g->adj_list[next].in--;                                                   // 入度减1
+            if (g->adj_list[next].in == 0) {                                          // 如果入度为0，入栈
                 s1.push(next);
             }
-            e = e->next;    // 移动到下一个边结点
+            e = e->next;                                                              // 移动到下一个边结点
         }
 
         // 输出最早发生时间
@@ -475,11 +475,11 @@ void criticalPath(AdjGraph *g) {
         while (!s2.empty()) {
             int curr = s2.top();
             s2.pop();
-            EdgeNode *e = g->adj_list[curr].head;    // 获取当前顶点的边结点
+            EdgeNode *e = g->adj_list[curr].head;                                   // 获取当前顶点的边结点
             while (e != nullptr) {
-                int next = e->edge_vex;    // 获取下一个顶点
+                int next = e->edge_vex;                                             // 获取下一个顶点
                 latest[curr] = std::min(latest[curr], latest[next] - e->weight);    // 更新最晚发生时间
-                e = e->next;               // 移动到下一个边结点
+                e = e->next;                                                        // 移动到下一个边结点
             }
         }
 
