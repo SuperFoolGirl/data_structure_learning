@@ -34,10 +34,10 @@ public:
             return *this;
         }
 
-        const_iterator &operator++(int) {
+        const_iterator operator++(int) {
             const_iterator old = *this;                     // this指向的是const_iterator这个类 两边类型是相同的
             ++(*this);                                      // 调用前置++
-            return old;                                     // old此时还是传进来的那个对象 不过对象的
+            return old;                                     // 返回常量引用
         }
 
         bool operator==(const const_iterator &rhs) const    // 比较地址
@@ -83,14 +83,14 @@ public:
             return *this;
         }
 
-        iterator &operator++(int) {
+        iterator operator++(int) {
             iterator old = *this;
             ++(*this);
             return old;
         }
 
     protected:
-        iterator(Node *p) : const_iterator(p) {}    // 这里初始化列表还可以写函数
+        iterator(Node *p) : const_iterator(p) {}
 
         // 注意，外部类不可访问内部类的私有成员，所以需要友元声明
         friend class List<Object>;    // List可访问iterator的私有成员
@@ -136,6 +136,7 @@ public:
     }
 
     iterator end() {
+        // end方法就应该这样返回，返回最后一个数据结点的下一个结点
         return iterator(tail);    // 最后一个节点的下一个 尾哨兵
     }
 
@@ -189,14 +190,21 @@ public:
         erase(--end());
     }
 
+    // push函数没有返回值 这里insert函数的返回值返回了一个迭代器 源码好像是这样写的 要模拟实现嘛
+    // 很多库函数都有类似的返回值 不过大多数时候用不到，只需要完成insert的功能即可 例如memcpy
     iterator insert(iterator itr, const Object &x) {
         Node *p = itr.current;
         theSize++;
-        return iterator(
-            p->prev = p->prev->next = new Node(
-                x, p->prev,
-                p));    // push函数没有返回值 这里insert函数的返回值返回了一个迭代器 源码好像是这样写的 要模拟实现嘛
-                        // 很多库函数都有类似的返回值 不过大多数时候用不到，只需要完成insert的功能即可 例如memcpy
+        // 连续赋值，从右向左执行
+        // 对于插入的值，首先为其创建结点，构造Node对象
+        // 观察构造函数的传参情况，可以发现，insert方法是要把x插在itr之前
+        // 这样可以很完美地处理尾插的情况，配合哨兵，免去特判。但说实话，使用起来的逻辑不太顺畅
+
+        // 这里可以参考pop_front的实现，p是一个已有的节点，它的前驱指针和后继指针都已经指向了正确的位置
+        // 然后将新结点的前驱指针指向p的前驱，将新结点的后继指针指向p。
+        // 最后将p的前驱的后继指针指向新结点，将p的前驱指针更新为新结点
+        // 这样就实现了在迭代器位置插入一个新结点
+        return iterator(p->prev = p->prev->next = new Node(x, p->prev, p));
     }
 
     iterator erase(iterator itr) {
@@ -218,6 +226,8 @@ public:
 
 private:
     int theSize;
+    // 哨兵节点
+    // 头哨兵和尾哨兵
     Node *head;
     Node *tail;
 
@@ -231,7 +241,17 @@ private:
 };
 
 int main() {
-    List<int> l;
-    // 修改测试
+    List<int> list;
+
+    list.push_back(1);
+    list.push_back(2);
+    list.push_back(3);
+    list.push_back(4);
+    list.push_back(5);
+
+    for (List<int>::iterator itr = list.begin(); itr != list.end(); itr++) {
+        cout << *itr << " ";
+    }
+
     return 0;
 }
