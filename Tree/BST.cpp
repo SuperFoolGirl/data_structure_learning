@@ -79,8 +79,7 @@ private:
         BinaryNode *left;
         BinaryNode *right;
 
-        BinaryNode(const Comparable &theElement, BinaryNode *l, BinaryNode *r)
-            : element(theElement), left(l), right(r) {}
+        BinaryNode(const Comparable &theElement, BinaryNode *l, BinaryNode *r) : element(theElement), left(l), right(r) {}
     };
 
     BinaryNode *root;
@@ -127,6 +126,13 @@ private:
         }
     }
 
+    // 删除逻辑总结
+    // 1. 如果删叶节点，直接删掉即可
+    // 2. 如果删除的结点只有一个子结点，那么直接让这个子结点代替自己
+    // 3. 如果删除的结点有两个子结点，那么找到它的前驱（左子树中最大的）/后继（右子树中最小的）来代替它，然后直接它的删除前驱/后继
+    //    这里注意一下：如果选择后继，那它一定是叶子结点（考虑下二叉搜索树的性质）
+    //    但如果是前驱，则不一定是叶子结点
+    //    所以选择后继在逻辑上更简便，直接转换为删除叶子结点(情况1)
     void remove(const Comparable &x, BinaryNode *&t) const {
         if (t == nullptr) {
             return;
@@ -137,19 +143,16 @@ private:
         } else if (t->element < x) {
             remove(x, t->right);
         } else if (t->left != nullptr && t->right != nullptr) {
-            // 已经递归到要删除的结点了 但该结点有两个儿子
-            // 需要安置好儿子结点的位置，才能把自己删掉
-            // 安置方法：把自己的位置换成右子树的最小值（左子树的最大值也可以，都是合法的）
-            // 合法原因是：中序遍历后，左子树max和右子树min分别为待删点的前驱和后继
+            // 已经递归到要删除的结点了 但该结点有两个儿子，来到了情况3
+            // 找到右子树的最小值结点（后继），来代替要删除的结点
+            // 解释：中序遍历后，左子树max和右子树min分别为待删点的前驱和后继
             // 然后删掉原本的右子树最小值结点
             t->element = findMin(t->right)->element;
             remove(t->element, t->right);
         } else {
-            // 最后总能走到这
-            // 此时t为要删除的结点，且只有一个儿子或没有儿子
-            // 以下逻辑可参考视频：
-            // 如果只有一个子树，那就直接让那个子树代替自己，不管左右
-            // 如果没有子树，那就直接删除自己
+            // 情况1和情况2：要删除的结点是叶子结点或只有一个子结点（情况3转化为情况1了）
+            // 如果只有一个儿子，那就直接让那个儿子代替自己，不管左右（情况2）
+            // 如果是叶子结点，那就直接删除自己（情况1）
             BinaryNode *oldNode = t;
             // 如果有左子树，就让t指向左子树，否则就让t指向右子树
             t = (t->left != nullptr) ? t->left : t->right;
