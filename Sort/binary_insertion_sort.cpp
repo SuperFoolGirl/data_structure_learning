@@ -5,7 +5,6 @@
 #include <iostream>
 #include <vector>
 
-
 // 封装的二分查找函数
 // 在 arr[low...high] 范围内查找 key 应该插入的位置
 // 返回第一个大于等于 key 的元素的索引

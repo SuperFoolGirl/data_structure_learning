@@ -12,20 +12,19 @@ typedef struct {
 } Queue;
 
 void initQueue(Queue *q) {
-    q->front = 0; // 队头指针
-    q->rear = 0;  // 队尾指针
+    q->front = 0;    // 队头指针
+    q->rear = 0;     // 队尾指针
 }
 
 bool isEmpty(Queue *q) {
-    return q->front == q->rear; // 队头和队尾指针相等表示队列为空
+    return q->front == q->rear;    // 队头和队尾指针相等表示队列为空
 }
-
 
 // 出队
 ElementType dequeue(Queue *q) {
     if (isEmpty(q)) {
         printf("Queue is empty\n");
-        return -1; // 队列为空，返回一个错误值
+        return -1;    // 队列为空，返回一个错误值
     }
     ElementType value = q->data[q->front++];
     return value;
@@ -42,8 +41,7 @@ bool adjustQueue(Queue *q) {
         q->front = 0;
         q->rear -= diff;
         return true;
-    }
-    else {
+    } else {
         printf("Queue is full\n");
         return false;
     }
@@ -53,21 +51,21 @@ bool adjustQueue(Queue *q) {
 bool enqueue(Queue *q, ElementType value) {
     if (q->rear >= MAXSIZE) {
         if (!adjustQueue(q)) {
-            return false; // 调整队列失败，返回false
+            return false;    // 调整队列失败，返回false
         }
     }
     q->data[q->rear++] = value;
-    return true; // 入队成功
+    return true;    // 入队成功
 }
 
 // 循环队列的入队
 bool enqueueLoop(Queue *q, ElementType value) {
     if ((q->rear + 1) % MAXSIZE == q->front) {
         printf("Queue is full\n");
-        return false; // 队列已满
+        return false;                     // 队列已满
     }
     q->data[q->rear] = value;
-    q->rear = (q->rear + 1) % MAXSIZE; // 循环队列的入队
+    q->rear = (q->rear + 1) % MAXSIZE;    // 循环队列的入队
     return true;
 }
 
@@ -75,7 +73,7 @@ bool enqueueLoop(Queue *q, ElementType value) {
 ElementType front(Queue *q) {
     if (isEmpty(q)) {
         printf("Queue is empty\n");
-        return -1; // 队列为空，返回一个错误值
+        return -1;    // 队列为空，返回一个错误值
     }
     return q->data[q->front];
 }

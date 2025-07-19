@@ -103,7 +103,7 @@ void inOrder(ThreadedTree head) {
     while (curr != head) {               // 树被线索化成了双向循环链表，最后会回到头节点
         // 找左儿子
         while (curr->ltag == 0) {
-            curr = curr->lchild;         // 中序遍历，先找最左端
+            curr = curr->lchild;    // 中序遍历，先找最左端
         }
 
         printf("%c ", curr->data);
@@ -122,7 +122,7 @@ void inOrder(ThreadedTree head) {
 int main() {
     ThreadedTree head;    // 虚拟头节点
     ThreadedTree T;
-    
+
     // 创建二叉树
     createTree(&T);
     // 线索化

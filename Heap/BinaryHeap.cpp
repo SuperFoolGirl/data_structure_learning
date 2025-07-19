@@ -146,7 +146,7 @@ public:
         while (!isEmpty()) {
             sorted.push_back(extractMin());    // 依次提取最小元素
         }
-        heap = sorted;    // 将排序后的结果赋值回堆
+        heap = sorted;                         // 将排序后的结果赋值回堆
         // 打印排序后的结果
         printHeap("Sorted elements:");
     }

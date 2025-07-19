@@ -12,7 +12,6 @@
 #include <iostream>
 #include <vector>
 
-
 // 辅助函数：下沉操作，用于维护堆的性质
 // array: 待调整的数组
 // heapSize: 当前堆的大小（参与调整的元素范围）

@@ -208,8 +208,7 @@ public:
                 current = root;    // 回到根节点，准备解码下一个字符
             } else if (current == nullptr) {
                 // 路径中断，编码流有问题
-                throw std::runtime_error(
-                    "Error: Invalid Huffman code encountered during decoding (path ended prematurely).");
+                throw std::runtime_error("Error: Invalid Huffman code encountered during decoding (path ended prematurely).");
             }
         }
 
@@ -261,7 +260,7 @@ int main() {
 
         // 解码文本
         std::string decodedText = huffman_compressor.decode(encodedText);
-        std::cout << "Decoded Text: \"" << decodedText << "\"" <<  std::endl;
+        std::cout << "Decoded Text: \"" << decodedText << "\"" << std::endl;
 
         // 验证解码结果
         if (text == decodedText) {
@@ -318,7 +317,9 @@ int main() {
         std::cerr << "Unhandled runtime error: " << e.what() << std::endl;
     } catch (const std::exception &e) {
         std::cerr << "Unhandled standard exception: " << e.what() << std::endl;
-    } catch (...) { std::cerr << "Unhandled unknown exception!" << std::endl; }
+    } catch (...) {
+        std::cerr << "Unhandled unknown exception!" << std::endl;
+    }
 
     return 0;
 }

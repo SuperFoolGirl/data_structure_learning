@@ -40,8 +40,7 @@ public:
         AvlNode *right;
         int height;
 
-        AvlNode(const Comparable &theElement, AvlNode *l, AvlNode *r, int h = 0)
-            : element(theElement), left(l), right(r), height(h) {}
+        AvlNode(const Comparable &theElement, AvlNode *l, AvlNode *r, int h = 0) : element(theElement), left(l), right(r), height(h) {}
     };
 
     AvlTree() : root(nullptr) {}

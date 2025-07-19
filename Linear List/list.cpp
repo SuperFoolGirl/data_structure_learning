@@ -120,7 +120,7 @@ public:
         }
         clear();
         for (const_iterator itr = rhs.begin(); itr != rhs.end(); itr++) {    // 调用itr构造函数 current就有了
-            push_back(*itr);    // 这里才是重点 const_iterator类虽然是独立的 但*调用重载函数 与current建立了连接
+            push_back(*itr);                                                 // 这里才是重点 const_iterator类虽然是独立的 但*调用重载函数 与current建立了连接
         }
         return *this;
     }

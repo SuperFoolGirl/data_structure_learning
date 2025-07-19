@@ -263,8 +263,7 @@ void kruskal(Graph *g) {
         // 如果起点和终点不在同一个集合中，说明不会形成环
         if (n != m) {
             parent[n] = m;    // 合并两个集合，将终点的根节点指向起点的根节点
-            printf("Edge: %c - %c, Weight: %d\n", g->vertex[g->edge[i].start], g->vertex[g->edge[i].end],
-                   g->edge[i].weight);
+            printf("Edge: %c - %c, Weight: %d\n", g->vertex[g->edge[i].start], g->vertex[g->edge[i].end], g->edge[i].weight);
         }
     }
 }
@@ -275,11 +274,11 @@ void kruskal(Graph *g) {
 // 优先队列
 void dijkstra(Graph *g) {
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;    // 最小堆
-    std::vector<int> dist(g->vertex_num, MAX);     // 初始化距离数组，初始值为最大值
-    std::vector<int> parent(g->vertex_num, -1);    // 记录前驱节点，用于最后输出路径
-    int start = 0;                                 // 起点索引，这里假设从顶点A开始
-    dist[start] = 0;                               // 起点到自己的距离为0
-    pq.push({0, start});                           // 将起点加入优先队列，
+    std::vector<int> dist(g->vertex_num, MAX);                                                        // 初始化距离数组，初始值为最大值
+    std::vector<int> parent(g->vertex_num, -1);                                                       // 记录前驱节点，用于最后输出路径
+    int start = 0;                                                                                    // 起点索引，这里假设从顶点A开始
+    dist[start] = 0;                                                                                  // 起点到自己的距离为0
+    pq.push({0, start});                                                                              // 将起点加入优先队列，
     // 优先队列中的元素是一个pair，第一个元素是距离，第二个元素是顶点索引
     // curr代表当前处理的顶点，next是下一步待扩展的顶点
     while (!pq.empty()) {
@@ -448,12 +447,12 @@ void criticalPath(AdjGraph *g) {
     while (!s1.empty()) {
         int curr = s1.top();
         s1.pop();
-        printf("%c\n", g->adj_list[curr].data);    // 拓扑排序输出
-        s2.push(curr);                             // 将当前顶点入栈，后续用于逆序处理
+        printf("%c\n", g->adj_list[curr].data);                                       // 拓扑排序输出
+        s2.push(curr);                                                                // 将当前顶点入栈，后续用于逆序处理
 
-        EdgeNode *e = g->adj_list[curr].head;      // 获取当前顶点的边结点
+        EdgeNode *e = g->adj_list[curr].head;                                         // 获取当前顶点的边结点
         while (e != nullptr) {
-            int next = e->edge_vex;                // 获取下一个顶点
+            int next = e->edge_vex;                                                   // 获取下一个顶点
             earliest[next] = std::max(earliest[next], earliest[curr] + e->weight);    // 更新最早发生时间
             g->adj_list[next].in--;                                                   // 入度减1
             if (g->adj_list[next].in == 0) {                                          // 如果入度为0，入栈

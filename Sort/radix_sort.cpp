@@ -32,7 +32,6 @@
 #include <string>
 #include <vector>
 
-
 // 为了方便描述桶，这里使用std::vector<std::vector<int>>来模拟桶和队列
 // 理论上，为了“节省空间”和“先进先出”，使用链表实现的队列数组更符合描述
 // 但实际编程中，std::vector 的性能优化和易用性使其成为一个不错的选择

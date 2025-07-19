@@ -1,6 +1,7 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+
 
 #define MAXSIZE 100
 typedef int ElementType;
@@ -24,7 +25,7 @@ bool isEmpty(Stack *s) {
 bool push(Stack *s, ElementType value) {
     if (s->top >= MAXSIZE - 1) {
         printf("Stack overflow\n");
-        return false; // 栈满，无法入栈
+        return false;    // 栈满，无法入栈
     }
     s->data[++s->top] = value;
     return true;
@@ -33,7 +34,7 @@ bool push(Stack *s, ElementType value) {
 ElementType pop(Stack *s) {
     if (isEmpty(s)) {
         printf("Stack underflow\n");
-        return -1; // 栈空，无法出栈
+        return -1;    // 栈空，无法出栈
     }
     return s->data[s->top--];
 }
@@ -41,11 +42,10 @@ ElementType pop(Stack *s) {
 ElementType front(Stack *s) {
     if (isEmpty(s)) {
         printf("Stack is empty\n");
-        return -1; // 栈空，无法获取栈顶元素
+        return -1;    // 栈空，无法获取栈顶元素
     }
     return s->data[s->top];
 }
-
 
 int main() {
     return 0;

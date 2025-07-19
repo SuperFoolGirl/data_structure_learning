@@ -5,7 +5,6 @@
 #include <iostream>     // 引入输入输出流库
 #include <vector>       // 引入动态数组库
 
-
 // 冒泡排序函数
 void bubbleSort(std::vector<int> &arr) {
     int n = arr.size();    // 获取数组（向量）的长度
@@ -28,7 +27,6 @@ void bubbleSort(std::vector<int> &arr) {
 #include <algorithm>    // 引入 std::swap 函数
 #include <iostream>     // 引入输入输出流库
 #include <vector>       // 引入动态数组库
-
 
 // 改进的冒泡排序函数
 void bubbleSortOptimized(std::vector<int> &arr) {

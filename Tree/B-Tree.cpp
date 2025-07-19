@@ -328,7 +328,7 @@ private:
                 if (idx != keys.size()) {    // 合并 children[idx] 和 children[idx+1]
                     // 正常向右合并
                     merge(idx);
-                } else {                     // 合并 children[idx-1] 和 children[idx]
+                } else {    // 合并 children[idx-1] 和 children[idx]
                     // 最右端子结点无法向右合并，于是转化为向左合并
                     merge(idx - 1);
                 }

@@ -153,9 +153,9 @@ int RPN(Stack *s) {
                 break;
             default:
                 printf("Error: Unknown operator\n");
-                return -1;      // 未知操作符
+                return -1;                    // 未知操作符
             }
-            push(s, result);    // 将结果压入栈中
+            push(s, result);                  // 将结果压入栈中
         }
         token = getToken(&symbol, &index);    // 获取下一个符号
     }
@@ -181,7 +181,6 @@ int main() {
     //     printf("The result of the expression is: %d\n", res);
     // }
     printf("%s", ieexpr);
-    
 
     clearStack(s);
     return 0;

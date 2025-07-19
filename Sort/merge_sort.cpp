@@ -84,7 +84,7 @@ void merge(std::vector<int> &array, int left, int mid, int right) {
 // 那么第一次执行merge函数的结点，就是最左边的父节点
 void mergeSortRecursive(std::vector<int> &array, int left, int right) {
     if (left >= right) {
-        return;                             // 如果子数组只有一个或没有元素，则直接返回（已经有序）
+        return;                       // 如果子数组只有一个或没有元素，则直接返回（已经有序）
     }
 
     int mid = (left + right) >> 1;    // 计算中间索引，向下取整

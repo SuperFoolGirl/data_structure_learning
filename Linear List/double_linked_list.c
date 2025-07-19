@@ -123,7 +123,7 @@ int main() {
     insertHead(head, 10);
     insertHead(head, 20);
     insertTail(head, 30);
-    deleteNode(head, 2); // 删除位置2的节点
+    deleteNode(head, 2);    // 删除位置2的节点
     printList(head);
     freeList(head);
     return 0;
