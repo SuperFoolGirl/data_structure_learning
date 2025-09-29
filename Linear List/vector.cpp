@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
 
-template<typename Object>
+template <typename Object>
 class Vector {
 public:
     Vector(int initSize = 0) : theSize(initSize), theCapacity(initSize + SPARE_CAPACITY) {
