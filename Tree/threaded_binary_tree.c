@@ -18,8 +18,8 @@ typedef char ElemType;
 
 typedef struct ThreadedNode {
     ElemType data;
-    struct ThreadedNode *lchild;
-    struct ThreadedNode *rchild;
+    struct ThreadedNode* lchild;
+    struct ThreadedNode* rchild;
     int ltag;    // 0表示左孩子，1表示前驱
     int rtag;    // 0表示右孩子，1表示后继
 } ThreadedNode;
@@ -27,8 +27,8 @@ typedef struct ThreadedNode {
 // 简单说一下给指针重命名的内在逻辑
 // 1. 祖宗之法不可变
 // 2.
-// 只要形参出现一级指针，就意味着函数内要对指针指向的值进行修改；如果没有一级指针，那就是只是使用值。如此一来，规避了二级以上指针的复杂性
-typedef ThreadedNode *ThreadedTree;
+// 只要形参出现一级指针，就意味着函数内要对指针指向的值进行修改；如果没有一级指针，那就是只是使用值
+typedef ThreadedNode* ThreadedTree;
 
 // 借助字符串来构建树，#代表空位（前序序列）
 char str[] = "ABDH##I##EJ###CF##G##";
@@ -36,7 +36,8 @@ int idx = 0;
 ThreadedTree prev = NULL;    // 前驱节点
 
 // 按照前序遍历的方式创建二叉树
-void createTree(ThreadedTree *T) {    // 形参是二级指针。因为需要对传进来的指针进行修改
+// 形参是二级指针。因为需要对传进来的指针进行修改
+void createTree(ThreadedTree* T) {
     ElemType ch = str[idx++];
     if (ch == '#') {
         *T = NULL;
@@ -65,11 +66,13 @@ void threading(ThreadedTree T) {
             T->ltag = 1;         // 左孩子是前驱
         }
         // 逻辑上想让T->rchild指向后继，但实际上是让前驱的rchild指向当前结点，即前驱的后继是T。因为此时还没访问到T的后继
+        // 觉得不好理解，来一张中序线索化的流程图就明白了
         if (prev->rchild == NULL) {
-            prev->rchild = T;    // 如果前驱的右孩子为空，则将前驱的右孩子指向当前结点
-            prev->rtag = 1;      // 前驱是后继
+            // 如果前驱的右孩子为空，则将前驱的右孩子指向当前结点
+            prev->rchild = T;
+            prev->rtag = 1;    // 前驱是后继
         }
-        prev = T;                // 更新前驱为当前结点
+        prev = T;              // 更新前驱为当前结点
 
         threading(T->rchild);
     }
@@ -77,11 +80,11 @@ void threading(ThreadedTree T) {
 
 // 中序线索化
 // 这个函数主要做四件事，开头的注释中有
-void inOrderThreading(ThreadedTree *head, ThreadedTree T) {
+void inOrderThreading(ThreadedTree* head, ThreadedTree T) {
     // 创建头节点
     *head = (ThreadedTree)malloc(sizeof(ThreadedTree));
-    (*head)->ltag = 0;          // 左孩子指向根
-    (*head)->rtag = 1;          // 右孩子指向线索（孩子是构成树的边，线索是树之外的东西）
+    (*head)->ltag = 0;    // 左孩子指向根
+    (*head)->rtag = 1;    // 右孩子指向线索（孩子是构成树的边，线索是树之外的东西）
     (*head)->rchild = *head;    // 初始化右孩子为头节点自身
 
     // 1. 头节点的lchild指向根
@@ -100,7 +103,7 @@ void inOrderThreading(ThreadedTree *head, ThreadedTree T) {
 // 中序遍历
 void inOrder(ThreadedTree head) {
     ThreadedTree curr = head->lchild;    // 从根节点开始遍历
-    while (curr != head) {               // 树被线索化成了双向循环链表，最后会回到头节点
+    while (curr != head) {    // 树被线索化成了双向循环链表，最后会回到头节点
         // 找左儿子
         while (curr->ltag == 0) {
             curr = curr->lchild;    // 中序遍历，先找最左端
