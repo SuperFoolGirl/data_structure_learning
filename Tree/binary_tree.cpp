@@ -72,6 +72,16 @@ int getDepth(BiTree root) {
     return depth;
 }
 
+// 提供另外一个递归求深度的方法
+int getDepthRecursive(BiTree root) {
+    if (root == nullptr) {
+        return 0;
+    }
+    int left_depth = getDepthRecursive(root->lchild);
+    int right_depth = getDepthRecursive(root->rchild);
+    return std::max(left_depth, right_depth) + 1;
+}
+
 bool isLeaf(BiTree node) {
     return node != nullptr && node->lchild == nullptr && node->rchild == nullptr;
 }
