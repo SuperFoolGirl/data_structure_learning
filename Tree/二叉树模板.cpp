@@ -60,13 +60,13 @@ private:
     // 建树方法
     // 这里提供根据前序遍历来建树的方法，边输入边建树
     void buildTree(TreeNode*& t) {
-        int val;
+        string val;
         cin >> val;
-        if (val == 0) {    // 约定0表示空节点
+        if (val == "#") {    // 约定#表示空节点
             t = nullptr;
             return;
         }
-        t = new TreeNode(val);
+        t = new TreeNode(stoi(val));
         buildTree(t->left);
         buildTree(t->right);
     }
