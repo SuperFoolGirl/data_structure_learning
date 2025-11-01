@@ -144,6 +144,37 @@ public:
         size_--;
     }
 
+    // 重载erase，接受结点指针进行删除
+    // 平替迭代器
+    void erase(Node* node) {
+        if (node == nullptr || size_ == 0) {
+            return;
+        }
+
+        Node* to_del = node;
+
+        // 1. 特判：只有一个节点
+        if (size_ == 1) {
+            delete to_del;
+            head = nullptr;
+            tail = nullptr;
+        } else {
+            // 2. 一般情况
+            // 如果要删除头尾点，需要更新head或tail指针
+            if (to_del == head) {
+                head = head->next;
+            } else if (to_del == tail) {
+                tail = tail->prev;
+            }
+
+            to_del->prev->next = to_del->next;
+            to_del->next->prev = to_del->prev;
+
+            delete to_del;
+        }
+        size_--;
+    }
+
     int size() const {
         return size_;
     }
