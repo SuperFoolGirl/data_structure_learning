@@ -6,7 +6,7 @@
 using namespace std;
 
 class DoublyCircularLinkedList {
-private:
+public:
     struct Node {
         int data;
         Node* prev;
@@ -18,7 +18,6 @@ private:
             , next(nullptr) {}
     };
 
-public:
     Node* head;
     Node* tail;
     int size_;
