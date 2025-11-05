@@ -31,14 +31,14 @@ std::vector<bool> visited(MAX_SIZE);           // 访问标记数组
 struct EdgeNode {
     int edge_vex;    // 一条邻接表中顶点的序号
     int weight;      // 权重
-    EdgeNode *next;
+    EdgeNode* next;
 };
 
 // 顶点结点，用于邻接表表头
 struct VertexNode {
     int in;             // 入度
     VertexType data;    // 顶点数据
-    EdgeNode *head;     // 指向边结点的指针
+    EdgeNode* head;     // 指向边结点的指针
 };
 
 // 邻接表结构体
@@ -55,7 +55,7 @@ void resetVisited() {
     }
 }
 
-void createAdjGraph(Graph *g, AdjGraph *adj_g) {
+void createAdjGraph(Graph* g, AdjGraph* adj_g) {
     adj_g->vertex_num = g->vertex_num;
     adj_g->edge_num = g->edge_num;
 
@@ -66,9 +66,9 @@ void createAdjGraph(Graph *g, AdjGraph *adj_g) {
     }
 
     // 遍历边数组，将边添加到邻接表中
-    for (const auto &e : g->edge) {
+    for (const auto& e : g->edge) {
         // 创建新的边结点
-        EdgeNode *new_edge = new EdgeNode;
+        EdgeNode* new_edge = new EdgeNode;
         new_edge->edge_vex = e.end;     // 设置边结点的顶点序号
         new_edge->weight = e.weight;    // 设置边结点的权重
         // 实质是头插法
@@ -80,7 +80,7 @@ void createAdjGraph(Graph *g, AdjGraph *adj_g) {
 
 // 该函数用于创建一个特定的图，这里没有给出通用的创建方法。本例中的图也是特定的，仅供参考
 // 本图为带权无向图
-void createGraph(Graph *g) {
+void createGraph(Graph* g) {
     resetVisited();    // 重置访问标记数组
 
     g->vertex_num = 9;
@@ -147,7 +147,7 @@ void createGraph(Graph *g) {
         }
     }
     // 给edge数组排序，按权值从小到大，后面kruskal算法需要
-    std::sort(g->edge.begin(), g->edge.end(), [](const Edge &a, const Edge &b) {
+    std::sort(g->edge.begin(), g->edge.end(), [](const Edge& a, const Edge& b) {
         return a.weight < b.weight;    // 按权值排序，lambda表达式创建匿名函数
     });
 
@@ -159,7 +159,7 @@ void createGraph(Graph *g) {
     }
 }
 
-int find(int *parent, int index) {
+int find(int* parent, int index) {
     if (parent[index] != index) {
         parent[index] = find(parent, parent[index]);    // 路径压缩
     }
@@ -168,7 +168,7 @@ int find(int *parent, int index) {
 
 // 类似前序遍历，用dfs实现
 // 图是连通的，而且不需要找路径，所以不需要重置标记，即dfs后没有必要重置visited数组
-void dfs(Graph *g, int i) {
+void dfs(Graph* g, int i) {
     visited[i] = true;
     printf("%c\n", g->vertex[i]);    // 访问顶点
     // 描述一下访问过程：
@@ -183,7 +183,7 @@ void dfs(Graph *g, int i) {
 }
 
 // 层序遍历
-void bfs(Graph *g) {
+void bfs(Graph* g) {
     int curr = 0;
     visited[curr] = true;               // 标记起点已访问
     printf("%c\n", g->vertex[curr]);    // 访问起点
@@ -209,7 +209,7 @@ void bfs(Graph *g) {
 // Kruskal算法：先将所有边按权值从小到大排序，然后依次取出边，判断是否形成环，直到所有结点都被访问
 // 由于图是连通的，所以可以从任意一个顶点开始
 // 提前说一句，代码实现与离散数学的肉眼做法不太一样
-void prim(Graph *g) {
+void prim(Graph* g) {
     int min_edge[MAX_SIZE];     // 记录当前最小边的权值
     int vex_index[MAX_SIZE];    // 值表示起点，下标表示终点。二者映射代表边的关系
 
@@ -248,7 +248,7 @@ void prim(Graph *g) {
 }
 
 // 边少时，即对于稀疏图，Kruskal算法更高效
-void kruskal(Graph *g) {
+void kruskal(Graph* g) {
     // 需要用到已排序的edge数组和并查集
     // 回忆下并查集在图中的作用：判断两个顶点是否在同一连通分量中
     int parent[g->vertex_num];    // 并查集的父节点数组
@@ -263,7 +263,8 @@ void kruskal(Graph *g) {
         // 如果起点和终点不在同一个集合中，说明不会形成环
         if (n != m) {
             parent[n] = m;    // 合并两个集合，将终点的根节点指向起点的根节点
-            printf("Edge: %c - %c, Weight: %d\n", g->vertex[g->edge[i].start], g->vertex[g->edge[i].end], g->edge[i].weight);
+            printf("Edge: %c - %c, Weight: %d\n", g->vertex[g->edge[i].start], g->vertex[g->edge[i].end],
+                   g->edge[i].weight);
         }
     }
 }
@@ -272,13 +273,13 @@ void kruskal(Graph *g) {
 // Dijkstra算法：从起点开始，逐步扩展到所有顶点，找到最短路径
 // 注意：Dijkstra算法只能用于非负权图，且不能处理负权边
 // 优先队列
-void dijkstra(Graph *g) {
+void dijkstra(Graph* g) {
     std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<>> pq;    // 最小堆
-    std::vector<int> dist(g->vertex_num, MAX);                                                        // 初始化距离数组，初始值为最大值
-    std::vector<int> parent(g->vertex_num, -1);                                                       // 记录前驱节点，用于最后输出路径
-    int start = 0;                                                                                    // 起点索引，这里假设从顶点A开始
-    dist[start] = 0;                                                                                  // 起点到自己的距离为0
-    pq.push({0, start});                                                                              // 将起点加入优先队列，
+    std::vector<int> dist(g->vertex_num, MAX);     // 初始化距离数组，初始值为最大值
+    std::vector<int> parent(g->vertex_num, -1);    // 记录前驱节点，用于最后输出路径
+    int start = 0;                                 // 起点索引，这里假设从顶点A开始
+    dist[start] = 0;                               // 起点到自己的距离为0
+    pq.push({0, start});                           // 将起点加入优先队列，
     // 优先队列中的元素是一个pair，第一个元素是距离，第二个元素是顶点索引
     // curr代表当前处理的顶点，next是下一步待扩展的顶点
     while (!pq.empty()) {
@@ -334,7 +335,7 @@ void dijkstra(Graph *g) {
 // 3. 对于图中的每个顶点，依次以它为中间点，更新dist数组和path数组
 // 4. 以顶点k为中间点，k行k列以及主对角线不需要动，其他行列更新为以k为中间点的最短路径
 // 5. 最终dist数组中存储了所有顶点对之间的最短路径，path数组中存储了前驱节点信息。根据path一步步回溯即可得到路径
-void floyd(Graph *g) {
+void floyd(Graph* g) {
     int dist[MAX_SIZE][MAX_SIZE];    // 最短路径矩阵
     int path[MAX_SIZE][MAX_SIZE];    // 前驱节点矩阵
 
@@ -389,7 +390,7 @@ void floyd(Graph *g) {
 // 每次选择入度为0的顶点，将其加入结果序列，并删除该顶点及其出边，直到所有顶点都被处理
 // 如果遇到环，则无法进行拓扑排序
 // 代码中，需要把邻接矩阵转为邻接表
-void topologicalSort(AdjGraph *g) {
+void topologicalSort(AdjGraph* g) {
     std::stack<int> s;                   // 用栈来存储入度为0的顶点
     for (int i = 0; i < g->vertex_num; ++i) {
         if (g->adj_list[i].in == 0) {    // 如果入度为0，入栈
@@ -401,7 +402,7 @@ void topologicalSort(AdjGraph *g) {
         int curr = s.top();
         s.pop();
         printf("%c ", g->adj_list[curr].data);    // 访问顶点
-        EdgeNode *e = g->adj_list[curr].head;     // 获取当前顶点的边结点
+        EdgeNode* e = g->adj_list[curr].head;     // 获取当前顶点的边结点
 
         // 遍历当前顶点的所有出边，即遍历一条邻接表
         // 所有出边的入度都减1，且入度为0的顶点入栈
@@ -427,7 +428,7 @@ void topologicalSort(AdjGraph *g) {
 // 关键路径上的活动称为关键活动，关键活动的延误会导致整个工程的延误
 // 在一个表示工程的带权有向图中，用顶点表示事件，用有向边表示活动，用边上的权值表示活动持续事件，称为AOE网（带权值的图也被称为网）
 // 拓扑排序仅能体现做事的优先级，但不能体现做事的时间，关键路径则可以
-void criticalPath(AdjGraph *g) {
+void criticalPath(AdjGraph* g) {
     // 过程中用的拓扑排序
     std::stack<int> s1;
     std::stack<int> s2;
@@ -447,12 +448,12 @@ void criticalPath(AdjGraph *g) {
     while (!s1.empty()) {
         int curr = s1.top();
         s1.pop();
-        printf("%c\n", g->adj_list[curr].data);                                       // 拓扑排序输出
-        s2.push(curr);                                                                // 将当前顶点入栈，后续用于逆序处理
+        printf("%c\n", g->adj_list[curr].data);    // 拓扑排序输出
+        s2.push(curr);                             // 将当前顶点入栈，后续用于逆序处理
 
-        EdgeNode *e = g->adj_list[curr].head;                                         // 获取当前顶点的边结点
+        EdgeNode* e = g->adj_list[curr].head;      // 获取当前顶点的边结点
         while (e != nullptr) {
-            int next = e->edge_vex;                                                   // 获取下一个顶点
+            int next = e->edge_vex;                // 获取下一个顶点
             earliest[next] = std::max(earliest[next], earliest[curr] + e->weight);    // 更新最早发生时间
             g->adj_list[next].in--;                                                   // 入度减1
             if (g->adj_list[next].in == 0) {                                          // 如果入度为0，入栈
@@ -474,7 +475,7 @@ void criticalPath(AdjGraph *g) {
         while (!s2.empty()) {
             int curr = s2.top();
             s2.pop();
-            EdgeNode *e = g->adj_list[curr].head;                                   // 获取当前顶点的边结点
+            EdgeNode* e = g->adj_list[curr].head;                                   // 获取当前顶点的边结点
             while (e != nullptr) {
                 int next = e->edge_vex;                                             // 获取下一个顶点
                 latest[curr] = std::min(latest[curr], latest[next] - e->weight);    // 更新最晚发生时间
