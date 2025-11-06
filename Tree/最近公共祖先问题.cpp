@@ -122,6 +122,9 @@ private:
     // 另外，这个函数要利用递归特性，来记录路径
     // 当走到目标终点，即t->val == val时，递归开始回溯，不会再往前走了
     // 回溯过程一定就是lca到目标结点的路径，不会有别的多余结点
+    // 虽然这是树的递归，但是给了返回值，有强制返回的return；不像传统树递归的自然执行
+    // 如果left_dist得到了非-1的值，那么会将它返回，不会继续执行下面的getDistance
+    // 好好体会这种return对递归的控制，在未来的问题中善于利用
     // 因此，控制使得只有这段回溯的路上，结点进行记录即可
     int getDistance(TreeNode* t, int val, int depth, vector<int>& path, bool& found) {
         if (t == nullptr) {
