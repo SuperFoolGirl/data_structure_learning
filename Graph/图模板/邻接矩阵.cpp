@@ -86,8 +86,10 @@ public:
                 }
             }
 
+            // 如果图连通，会正常结束
+            // 如果图不连通，外层循环还没结束，这里需要强制跳出
             if (curr_node == -1) {
-                break;    // 剩下的节点均不可达
+                break;    // 所有点均已加入mst集合
             }
 
             if (min_weight[curr_node] == MAX) {
@@ -132,7 +134,7 @@ public:
             }
 
             if (curr_node == -1 || dist[curr_node] == MAX) {
-                break;    // 剩余节点不可达
+                break;    // 所有可达节点均已访问，不可达节点不连通
             }
 
             vis[curr_node] = true;
