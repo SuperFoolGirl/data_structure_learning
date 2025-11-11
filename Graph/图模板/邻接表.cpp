@@ -8,13 +8,11 @@
 // 参考邻接表的示意图，每条单链表之间的元素是不会连接的，即next指针不会跨越链表。两条链表之间绝对没有指针连接。
 // 但是毫无疑问，图中边的两端是两个顶点，一定是存在“交错”的，而上述结构没有体现这种交错
 // 例如在dfs中，需要沿着图的方向走，不是沿着链表走
-// Edge* curr = nodes[from].head;
-// while (curr) {
+// for (Edge* curr = nodes[from].head; curr; curr = curr->next) {
 //     int to_node = curr->to;
 //     if (!visited[to_node]) {
 //         dfs(to_node, visited);  // 递归后，from改变，进入新的链表
 //     }
-//     curr = curr->next;
 // }
 // 可见，即使结构上没有体现交错，但逻辑上是存在交错的，从而可以满足有向图的遍历需求
 // “交错”体现在Edge::to，指向的是另一个Node；而Edge::next是服从当前链表的
@@ -22,6 +20,13 @@
 
 // 基于上面的讨论，将图转化为链表来考虑，是很容易想到，是否要用双向链表来表示无向图？
 // 实践上，最常用的还是两次加边法，因此不必考虑双向链表
+
+// 还有一点，经常会产生混淆：
+// 上述提到的独立链表，我们在遍历时经常会用到，从链表头遍历到尾
+// 但上述模式是基于邻接表，千万别忘了在图中是怎样的：
+// 在图中，遍历每条独立的邻接表，实际上是在遍历一个顶点的所有出边！
+// 千万不要混淆为类似链表的遍历方式！
+// 自己要积极去想象遍历图的过程，久而久之就会形成正确的认知
 
 // 边的结构体有两种：
 // 1. 用于邻接表
@@ -261,6 +266,56 @@ public:
         return components;
     }
 
+    // 前提：有向无环图
+    // 完成图中的所有事件，最耗时的路径，即为关键路径
+    // 最早开始时间和最晚开始时间，是保证在不影响总工期的前提下，某事件可以开始的最早和最晚时间
+    // 因此，关键路径上的活动的最早开始时间和最晚开始时间相等，因为本来就是最耗时的，必须按时完成
+
+    // AOE网，即activity on edge network，活动在边上
+    // 我们称顶点为事件，边为活动
+    // ve：某事件的最早发生时间
+    // vl：某事件的最晚发生时间
+    // e：某活动的最早开始时间
+    // l：某活动的最晚开始时间
+    // 事件本身并不耗时，耗时的是事件之间的活动。即点没有权，有权的是边
+
+    // ========ve计算========
+    // 当一个点入度不为0时，说明它有前驱事件；这很容易联想到拓扑排序
+    // 只有最耗时的前驱事件完成后，再完成它与当前事件之间的活动，当前活动才能开始
+    // 那么这里的活动其实就是边权，注意类比
+    // 对于起点来说，ve=0，因为没有前驱事件
+    // 对于非起点来说，ve=max(ve(所有前驱事件)+当前活动时间)
+
+    // ========vl计算========
+    // 终点的最早开始时间和最晚开始时间必然相等，因为终点必然在关键路径上
+    // 因此，vl(终点)=ve(终点)
+    // 其他点的vl先初始化为无穷大
+    // 只有保证后继事件能够按时完成，当前事件的最晚时间才能往后拖延
+    // 因此，vl=min(vl(所有后继事件)-当前活动时间)
+
+    // 所有点的ve和vl都计算完成后，ve和vl相等的活动即为关键活动
+    // 连接关键活动的路径即为关键路径
+    // 人眼能一眼把图连起来，但计算机却做不到，所以下面需要求e和l
+
+    // ========e和l的计算========
+    // 设某事件为u，后继事件为v。u,v之间的活动为w
+    // 显然我们要计算e(w)和l(w)
+    // 当u可以开始时，w就可以开始了。那么，u越早开始，w就越早开始
+    // 因此，e(w)=ve(u)
+    // 另一方面，想要w尽可能晚，就要让v尽可能晚开始，同时保证w完成后，不再有多余的事件间隙
+    // 也就是w完成后，恰好是v的最晚开始时间
+    // 因此，l(w)=vl(v)-w
+
+    // 下面回到关键路径，如何通过边的性质来判断该边是否属于关键路径：
+    // 一条边属于关键路径，当且仅当 e(边)=l(边)
+    // e(边)=ve(边的起点)，l(边)=vl(边的终点)-边权
+    // 联立得，关键路径判断的充要条件为 ve(起点)=vl(终点)-边权
+    // 可见，虽然关键路径的判断需要通过活动的最早和最晚开始时间来判断，但可以转化为事件。所以函数中只有两个数组来存储事件，而不是四个数组
+
+    // 求关键路径：
+    // 1. 拓扑排序求ve
+    // 2. 逆拓扑排序求vl
+    // 3. 遍历图里的每一条边，得到边的起点和终点，用 ve(起点)=vl(终点)-边权 来判断该边是否属于关键路径
     bool criticalPath(int start_node = 1, int end_node = -1) {
         if (start_node < 1 || start_node > node_num || (end_node != -1 && (end_node < 1 || end_node > node_num))) {
             if (start_node != end_node) {
@@ -279,12 +334,13 @@ public:
             return false;    // 有环，无法进行关键路径分析
         }
 
-        // 计算最早发生时间
+        // 根据拓扑排序，计算事件最早发生时间ve
         for (int node : topo_order) {
+            // 遍历node的所有出边
             for (Edge* e = nodes[node].head; e; e = e->next) {
-                int to_node = e->to;
+                int to = e->to;
                 int weight = e->weight;
-                earliest[to_node] = max(earliest[to_node], earliest[node] + weight);
+                earliest[to] = max(earliest[to], earliest[node] + weight);
             }
         }
 
@@ -292,12 +348,13 @@ public:
         latest[end_node] = earliest[end_node];
 
         // 计算最晚发生时间（逆拓扑序）
+        // rbegin()和rend()返回的是反向迭代器，遍历顺序是从后向前
         for (auto it = topo_order.rbegin(); it != topo_order.rend(); ++it) {
             int node = *it;
             for (Edge* e = nodes[node].head; e; e = e->next) {
-                int to_node = e->to;
+                int to = e->to;
                 int weight = e->weight;
-                latest[node] = min(latest[node], latest[to_node] - weight);
+                latest[node] = min(latest[node], latest[to] - weight);
             }
         }
 
@@ -349,7 +406,7 @@ public:
             tot_weight += curr_weight;
             node_joined++;
 
-            // 松弛操作
+            // 松弛操作：遍历所有与curr_node相连的边
             for (Edge* e = nodes[curr_node].head; e; e = e->next) {
                 int to = e->to;
                 int weight = e->weight;
