@@ -176,47 +176,44 @@ public:
     }
 
     // 根据哈夫曼树中的编码表，来解码文本
-    string decode(const string& encodedText) const {
+    string decode(const string& encoded_text) const {
         if (!root) {    // 如果树为空，无法解码
             return "";
         }
 
-        string decodedText = "";
-        HuffmanNode* current = root;
+        string decoded_text = "";
+        HuffmanNode* curr = root;
 
-        // 特殊处理：如果树只有一个节点，即构建树的字符串中的字符全部相同
+        // 如果树只有一个节点，即构建树的字符串中的字符全部相同
         if (root->isLeaf()) {
-            for (char bit : encodedText) {    // 假设编码是重复的 '0' 或其他
-                decodedText += root->data;
+            for (char bit : encoded_text) {
+                decoded_text += root->data;
             }
-            return decodedText;
+            return decoded_text;
         }
 
-        for (char bit : encodedText) {
+        for (char bit : encoded_text) {
             if (bit == '0') {
-                current = current->left;
+                curr = curr->left;
             } else if (bit == '1') {
-                current = current->right;
+                curr = curr->right;
             } else {
                 // 非法字符
                 return "";
             }
 
-            if (current && current->isLeaf()) {
-                decodedText += current->data;
-                current = root;    // 回到根节点，准备解码下一个字符
-            } else if (current == nullptr) {
-                // 路径中断，编码流有问题
-                return "";
+            if (curr && curr->isLeaf()) {
+                decoded_text += curr->data;
+                curr = root;    // 回到根节点，准备解码下一个字符
             }
         }
 
-        // 确保解码在叶子节点结束，否则编码可能不完整
-        if (current != root) {    // 如果解码结束后没有回到根节点，说明最后一个字符的编码不完整
+        // 如果解码结束后没有回到根节点，说明最后一个字符的编码不完整
+        if (curr != root) {
             return "";
         }
 
-        return decodedText;
+        return decoded_text;
     }
 
     // 打印哈夫曼编码表
