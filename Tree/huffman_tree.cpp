@@ -158,7 +158,7 @@ public:
     }
 
     // 根据哈夫曼树中的编码表，来编码文本
-    string encode(const string& text) {
+    string encode(const string& text) const {
         if (!root || huffman_codes.empty()) {    // 如果树为空，无法编码
             return "";
         }
@@ -166,7 +166,7 @@ public:
         string encoded_text = "";
         for (char c : text) {
             if (huffman_codes.count(c)) {
-                encoded_text += huffman_codes[c];
+                encoded_text += huffman_codes.at(c);
             } else {
                 // 如果文本中有未出现在编码表中的字符
                 return "";
