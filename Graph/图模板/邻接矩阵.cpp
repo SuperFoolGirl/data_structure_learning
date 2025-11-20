@@ -21,7 +21,7 @@ private:
     vector<int> in_degree;
 
 public:
-    static const int MAX = 0x3f3f3f3f;
+    static constexpr int MAX = 0x3f3f3f3f;
 
 public:
     Graph(int n, int e)
@@ -36,7 +36,7 @@ public:
         }
     }
 
-    void addEdge(int from, int to, int weight) {
+    void addEdge(int from, int to, int weight = 1) {
         // 正确处理重边，存储较小的边权
         if (matrix[from][to] > weight) {
             if (matrix[from][to] == MAX) {

@@ -101,7 +101,7 @@ public:
     }
 
     // 头插法，插入一条边，同时更新入度
-    void addEdge(int from, int to, int weight) {
+    void addEdge(int from, int to, int weight = 1) {
         Edge* new_edge = new Edge(to, weight);
         new_edge->next = nodes[from].head;
         nodes[from].head = new_edge;
