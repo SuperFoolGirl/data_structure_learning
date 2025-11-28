@@ -166,6 +166,7 @@ public:
         while (!q.empty()) {
             int t = q.front();
             q.pop();
+            
             topo_order.push_back(t);
 
             for (int to = 1; to <= node_num; ++to) {

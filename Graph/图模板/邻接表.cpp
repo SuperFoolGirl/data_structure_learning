@@ -149,6 +149,7 @@ public:
         while (!q.empty()) {
             int t = q.front();
             q.pop();
+            
             topo_order.push_back(t);
 
             for (Edge* e = nodes[t].head; e; e = e->next) {
@@ -184,15 +185,15 @@ public:
             int curr_dist = t.first;
             int curr_node = t.second;
 
-            if (vis[curr_node]) {
-                continue;
-            }
-            vis[curr_node] = true;
-
             // 剪枝
             if (curr_node == end_node) {
                 return curr_dist;
             }
+
+            if (vis[curr_node]) {
+                continue;
+            }
+            vis[curr_node] = true;
 
             for (Edge* e = nodes[curr_node].head; e; e = e->next) {
                 int to = e->to;
