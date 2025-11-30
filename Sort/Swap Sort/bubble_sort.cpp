@@ -1,6 +1,10 @@
 // 冒泡排序
 // 每轮都从前往后比较相邻的两个元素，如果前一个元素大于后一个元素，则交换它们。
 
+// 时间复杂度：最差O(n^2)，最好O(n)（已经有序），平均O(n^2)
+// 空间复杂度：O(1)，原地排序
+// 稳定性：稳定
+
 #include <algorithm>    // 引入 std::swap 函数
 #include <iostream>     // 引入输入输出流库
 #include <vector>       // 引入动态数组库
@@ -17,16 +21,12 @@ void bubbleSort(std::vector<int> &arr) {
         // -i 是为了排除已经排好序的末尾元素。
         for (int j = 0; j < n - 1 - i; ++j) {
             // 如果当前元素大于下一个元素，则交换它们
-            if (arr[j] > arr[j + 1]) {
+            if (arr[j] > arr[j + 1]) {  // 如果取等，则不稳定
                 std::swap(arr[j], arr[j + 1]);    // 使用 std::swap 进行交换
             }
         }
     }
 }
-
-#include <algorithm>    // 引入 std::swap 函数
-#include <iostream>     // 引入输入输出流库
-#include <vector>       // 引入动态数组库
 
 // 改进的冒泡排序函数
 void bubbleSortOptimized(std::vector<int> &arr) {
@@ -95,35 +95,4 @@ int main() {
     printArray(arr3);
 
     return 0;
-}
-
-// 打印数组的辅助函数
-void printArray(const std::vector<int> &arr) {
-    for (int num : arr) {
-        std::cout << num << " ";
-    }
-    std::cout << std::endl;
-}
-
-int main() {
-    // 示例用法
-    std::vector<int> myVector = {64, 34, 25, 12, 22, 11, 90};
-
-    std::cout << "原始数组: ";
-    printArray(myVector);
-
-    bubbleSort(myVector);    // 调用冒泡排序函数
-
-    std::cout << "排序后的数组: ";
-    printArray(myVector);
-
-    // 另一个测试用例
-    std::vector<int> anotherVector = {5, 1, 4, 2, 8};
-    std::cout << "\n原始数组2: ";
-    printArray(anotherVector);
-    bubbleSort(anotherVector);
-    std::cout << "排序后的数组2: ";
-    printArray(anotherVector);
-
-    return 0;    // 程序成功执行
 }

@@ -6,6 +6,10 @@
 // 如果比有序区最后一个还大，就直接放在最后
 // 否则，依次将有序区比它大的元素向后移动一位，直到找到合适的位置
 
+// 时间复杂度：最差O(n^2)（完全逆序），最好有序O(n)（已经有序），平均O(n^2)
+// 空间复杂度：O(1)，原地排序，只需要用单变量缓存作为辅助空间
+// 稳定性：稳定
+
 #include <iostream>
 #include <vector>
 
@@ -18,7 +22,7 @@ void insertionSort(std::vector<int> &arr) {
         int j = i - 1;
 
         // 将比 key 大的元素向右移动一个位置
-        while (j >= 0 && arr[j] > key) {
+        while (j >= 0 && arr[j] > key) {    // arr[j]>key 取等则不稳定
             // 向后移动，直接拷贝到后面去
             arr[j + 1] = arr[j];
             j--;
@@ -27,7 +31,7 @@ void insertionSort(std::vector<int> &arr) {
         // 如果跳出了while循环，说明此时key >= arr[j]
         // 则key应当插到arr[j + 1]的位置
         // 而原本的 arr[j+1] 已经被向后移动了，在上一轮已经令arr[j+2] = arr[j+1]了
-        // 因此这里直接把 key 放到 arr[j+1] 的位置即可
+        // 因此这里直接把 key 放到 arr[j+1] 的位置进行覆盖即可
         arr[j + 1] = key;
     }
 }

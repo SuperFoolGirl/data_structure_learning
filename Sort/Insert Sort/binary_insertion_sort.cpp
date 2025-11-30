@@ -1,7 +1,11 @@
 // 折半插入排序
 // 折半插入排序是插入排序的一种优化，它利用二分查找来确定待插入元素在已排序部分的正确位置，从而减少了比较的次数
 
-#include <algorithm>    // 包含 std::upper_bound 用于比较，但我们自己实现二分查找
+// 时间复杂度: 最差O(n^2)，最好O(n)（已经有序），平均O(n^2)
+// 空间复杂度: O(1)，原地排序
+// 稳定性: 稳定
+
+#include <algorithm>
 #include <iostream>
 #include <vector>
 

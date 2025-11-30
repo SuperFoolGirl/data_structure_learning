@@ -27,7 +27,12 @@
 // 重复上述操作，排好十位。此时个位的顺序被打破了，但是，后两位整体上是有序的
 // 重复上述操作直到最高位，所有的数就都有序了
 
-#include <algorithm>    // 用于std::max, std::to_string
+// n为数组长度，r为基数，d为最大数的位数
+// 时间复杂度: O(d*(n+r))（最差、最好、平均）
+// 空间复杂度: O(n)，需要额外的桶空间
+// 稳定性: 稳定
+
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -35,8 +40,7 @@
 // 为了方便描述桶，这里使用std::vector<std::vector<int>>来模拟桶和队列
 // 理论上，为了“节省空间”和“先进先出”，使用链表实现的队列数组更符合描述
 // 但实际编程中，std::vector 的性能优化和易用性使其成为一个不错的选择
-// 并且对于相对较小的基数（如10），内存开销通常可接受。
-// 如果数据量巨大且内存敏感，则需要自定义链表队列。
+// 考虑到局部性原理，vector的内存分配和访问效率通常优于链表，相当于是用空间换取时间
 
 // 辅助函数：获取一个整数的指定位上的数字
 // num: 要获取位数的整数
@@ -52,13 +56,13 @@ int getMax(const std::vector<int> &arr) {
     if (arr.empty()) {
         return 0;
     }
-    int maxVal = arr[0];
+    int max_val = arr[0];
     for (int i = 1; i < arr.size(); ++i) {
-        if (arr[i] > maxVal) {
-            maxVal = arr[i];
+        if (arr[i] > max_val) {
+            max_val = arr[i];
         }
     }
-    return maxVal;
+    return max_val;
 }
 
 // 基数排序函数
@@ -68,11 +72,12 @@ void radixSort(std::vector<int> &arr) {
     }
 
     // 1. 找到数组中的最大值，以确定需要处理多少位
-    int maxVal = getMax(arr);
+    int max_val = getMax(arr);
 
     // 从个位开始，依次对每一位进行计数排序（或桶排序）
+    // 从最低位开始排，即LSD（Least Significant Digit），是相对最简单的一种方式
     // exp 代表当前处理的位数：1 (个位), 10 (十位), 100 (百位), ...
-    for (int exp = 1; maxVal / exp > 0; exp *= 10) {
+    for (int exp = 1; max_val / exp > 0; exp *= 10) {
         // 创建10个桶（vector模拟队列）
         std::vector<std::vector<int>> buckets(10);    // 10个桶，每个桶是一个vector
 
@@ -84,10 +89,10 @@ void radixSort(std::vector<int> &arr) {
 
         // 3. 从0到9，依次取出每个桶中的元素，重新放回原数组
         // 这样就完成了当前位的排序
-        int index = 0;
+        int idx = 0;
         for (int i = 0; i < 10; ++i) {      // 遍历每个桶
             for (int num : buckets[i]) {    // 遍历当前桶中的所有元素
-                arr[index++] = num;         // 从桶中取出元素（vector的遍历模拟队列的出队，是先进先出的）
+                arr[idx++] = num;         // 从桶中取出元素（vector的遍历模拟队列的出队，是先进先出的）
             }
         }
     }

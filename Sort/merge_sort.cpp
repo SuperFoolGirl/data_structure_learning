@@ -22,7 +22,11 @@
 // 归并排序是稳定的。稳定与否取决于合并操作是否保持相同元素的相对顺序
 // 具体操作上，与大小比较是否取等有关。如果取等，即相同元素比较时，控制二者相对位置不变，即可保证稳定性
 
-#include <algorithm>    // 用于std::min
+// 时间复杂度: 最差O(n log n)，最好O(n log n)，平均O(n log n)
+// 空间复杂度: O(n)，需要额外的临时数组来存储合并结果
+// 稳定性: 稳定
+
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -37,15 +41,15 @@ void merge(std::vector<int> &array, int left, int mid, int right) {
     int n2 = right - mid;       // 右子数组的长度
 
     // 创建临时数组来存储左右子数组的元素
-    std::vector<int> leftArray(n1);
-    std::vector<int> rightArray(n2);
+    std::vector<int> left_array(n1);
+    std::vector<int> right_array(n2);
 
     // 将数据复制到临时数组
     for (int i = 0; i < n1; ++i) {
-        leftArray[i] = array[left + i];
+        left_array[i] = array[left + i];
     }
     for (int j = 0; j < n2; ++j) {
-        rightArray[j] = array[mid + 1 + j];
+        right_array[j] = array[mid + 1 + j];
     }
 
     // 合并临时数组回原始数组的相应位置
@@ -55,21 +59,21 @@ void merge(std::vector<int> &array, int left, int mid, int right) {
 
     // 比较两个子数组的元素，将较小的放入原始数组
     while (i < n1 && j < n2) {
-        if (leftArray[i] <= rightArray[j]) {
-            array[k++] = leftArray[i++];
+        if (left_array[i] <= right_array[j]) {
+            array[k++] = left_array[i++];
         } else {
-            array[k++] = rightArray[j++];
+            array[k++] = right_array[j++];
         }
     }
 
     // 将左子数组中剩余的元素全部放入原始数组
     while (i < n1) {
-        array[k++] = leftArray[i++];
+        array[k++] = left_array[i++];
     }
 
     // 将右子数组中剩余的元素全部放入原始数组
     while (j < n2) {
-        array[k++] = rightArray[j++];
+        array[k++] = right_array[j++];
     }
 }
 
@@ -101,6 +105,7 @@ void mergeSortRecursive(std::vector<int> &array, int left, int right) {
 
 // 归并排序的入口函数
 // 为了代码健壮性，增加对空数组的判断。因此添加一个新入口辅助函数
+// 这种设计模式在实际项目中很常见，在面向对象中还可以结合重载、访问控制等特性
 void mergeSort(std::vector<int> &array) {
     if (array.empty()) {
         return;

@@ -8,6 +8,13 @@
 // 2. 每次根结点与最后一个元素交换，然后下沉新根节点。共n-1次
 // 每次交换下来的根节点要隐藏，不再参与堆的调整
 
+// 建堆
+// 时间复杂度: O(n)，数学证明比较复杂
+// 排序
+// 时间复杂度: 最差O(n log n)，最好O(n log n)，平均O(n log n)
+// 空间复杂度: O(1)，原地排序
+// 稳定性: 不稳定
+
 #include <algorithm>    // 用于std::swap
 #include <iostream>
 #include <vector>
@@ -38,7 +45,7 @@ void heapify(std::vector<int> &array, int heapSize, int idx) {
     }
 }
 
-// 主函数：堆排序
+// 堆排序
 void heapSort(std::vector<int> &array) {
     int n = array.size();
     if (n <= 1) {

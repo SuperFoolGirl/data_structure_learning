@@ -6,6 +6,10 @@
 // 直到间隔为1时，实际上就是普通的插入排序了
 // 但由于前面的间隔插入排序，已经使得数组接近有序，因此最后的插入排序效率会很高
 
+// 时间复杂度: 最差O(n^2)，最好O(n)（已经有序），平均O(n^1.3)（依赖于间隔序列）
+// 空间复杂度: O(1)，原地排序
+// 稳定性: 不稳定
+
 #include <algorithm>    // 用于 std::swap
 #include <iostream>
 #include <vector>
@@ -17,11 +21,13 @@ void shellSort(std::vector<int> &arr) {
     // 从一个较大的间隔开始，逐渐缩小间隔
     // 通常选择 N/2, N/4 ... 1
     for (int gap = n / 2; gap > 0; gap /= 2) {
-        // 对每个间隔内的元素进行插入排序
+        // 每次gap锁定后，共有gap组待排序序列
+        // 其中，0~gap-1号位置的元素分别作为各组的第一个元素，默认有序
+        // 因此，需要从gap开始到n-1结束，每个元素插入到对应的组内已排序部分
         for (int i = gap; i < n; i++) {
             int temp = arr[i];
             int j;
-            // 将 arr[i] 插入到已排序的间隔子序列中
+            // 将 arr[i] 插入到已排序的间隔子序列中，类似插入排序，但步长为gap
             for (j = i; j >= gap && arr[j - gap] > temp; j -= gap) {
                 arr[j] = arr[j - gap];
             }
