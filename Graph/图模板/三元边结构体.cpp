@@ -61,6 +61,10 @@ public:
                 tot_weight += edges[i].weight;
                 used_edges++;
             }
+
+            if (used_edges == node_num - 1) {
+                break;
+            }
         }
 
         if (used_edges < node_num - 1) {

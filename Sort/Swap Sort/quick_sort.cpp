@@ -3,18 +3,18 @@
 // 直到空或只有一个元素的子数组被认为是有序的。
 
 // 时间复杂度: 最差O(n^2)，最好O(n log n)，平均O(n log n)
-// 最好情况分析： 每次划分都能将数组均匀分成两半，递归树很平衡，高度为 log n，每层处理 n 个元素，总时间复杂度为 O(n log n)
-// 最差情况分析： 每次划分都极度不均匀（例如已经有序的数组，每次选择的基准是最大或最小元素），递归树退化成链表，高度为 n，每层处理 n 个元素，总时间复杂度为 O(n^2)
+// 最好情况分析：每次划分都能将数组均匀分成两半，递归树很平衡，高度为log n，每层处理n个元素，总时间复杂度为O(n log n)
+// 最差情况分析：每次划分都极度不均匀，递归树退化成链表，高度为 n，每层处理 n 个元素，总时间复杂度为 O(n^2)
 
 // 空间复杂度: O(log n)（递归栈空间）
 // 稳定性: 不稳定
 
-#include <algorithm>    // 引入 std::swap 函数 (虽然填坑法中不直接用，但保留以防万一)
-#include <iostream>     // 引入输入输出流库
-#include <vector>       // 引入动态数组库
+#include <algorithm>
+#include <iostream>
+#include <vector>
 
 // 打印数组的辅助函数
-void printArray(const std::vector<int> &arr) {
+void printArray(const std::vector<int>& arr) {
     for (int num : arr) {
         std::cout << num << " ";
     }
@@ -23,7 +23,7 @@ void printArray(const std::vector<int> &arr) {
 
 // 分区函数：使用左基准和填坑法
 // 返回基准最终的索引
-int partition(std::vector<int> &arr, int low, int high) {
+int partition(std::vector<int>& arr, int low, int high) {
     // 1. 选择最左边的元素作为基准
     int pivot = arr[low];
 
@@ -63,7 +63,7 @@ int partition(std::vector<int> &arr, int low, int high) {
 }
 
 // 快速排序主函数
-void quickSort(std::vector<int> &arr, int low, int high) {
+void quickSort(std::vector<int>& arr, int low, int high) {
     // 这个if条件是递归的终止条件
     // 如果不满足 low < high，说明子数组为空或只有一个元素，已经是有序的
     if (low < high) {
