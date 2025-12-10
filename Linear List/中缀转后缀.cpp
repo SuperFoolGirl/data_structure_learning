@@ -243,13 +243,13 @@ long long calculatePostfix(const vector<string>& postfix_tokens, bool& is_valid)
 }
 
 int main() {
-    string post_expr;
-    getline(cin, post_expr);
+    string in_expr;
+    getline(cin, in_expr);
 
     // 将中缀表达式正确解析为按空格分割的token列表
     // 用vector<string>来存储token列表，这样方便后续处理
     // 正常情况下，中缀表达式之间无空格；后缀表达式是需要空格的
-    vector<string> infix_tokens = tokenizeInfixExpression(post_expr);
+    vector<string> infix_tokens = tokenizeInfixExpression(in_expr);
 
     // 将中缀表达式token列表转为后缀表达式token列表
     // 传入引用参数is_valid以判断表达式是否合法
