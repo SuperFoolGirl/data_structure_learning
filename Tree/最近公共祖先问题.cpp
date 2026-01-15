@@ -97,6 +97,8 @@ private:
     // 如果left_lca非空，说明公共祖先在root的左子树中
     // 如果最后返回nullptr，说明没找到公共祖先
     TreeNode* findLCA(TreeNode* t, int val1, int val2) {
+        // 前两个出口，针对结点
+        // 空结点和目标节点会在这里阻塞
         if (t == nullptr) {
             return nullptr;
         }
@@ -107,6 +109,8 @@ private:
         TreeNode* left_lca = findLCA(t->left, val1, val2);
         TreeNode* right_lca = findLCA(t->right, val1, val2);
 
+        // 后两个出口，针对子树（在执行递归后，即子树确定后，再选择出口）
+        // 那么，空结点和目标结点是无法走下来的
         if (left_lca && right_lca) {
             return t;    // 当前节点是最近公共祖先
         }

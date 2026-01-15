@@ -49,8 +49,15 @@ public:
 
         // 预处理：将中序遍历的值和索引存入哈希表
         // 其实就是做了个反函数
+        inorder_map_.clear();
         for (int i = 0; i < vector_size; ++i) {
             this->inorder_map_[inorder[i]] = i;
+        }
+
+        // 错误检查：前序和中序长度不一致
+        if (preorder.size() != inorder.size()) {
+            is_valid = false;
+            return nullptr;
         }
 
         // 调用核心递归函数
@@ -160,14 +167,12 @@ private:
         }
     }
 
-public:
-    // 用于存储中序遍历值及其索引，方便查找
-    unordered_map<int, int> inorder_map_;
-    // 判断给定的前序和中序遍历能否唯一确定一棵二叉树
-    bool is_valid;
-
 private:
     TreeNode* root;
+    // 判断给定的前序和中序遍历能否唯一确定一棵二叉树
+    bool is_valid;
+    // 用于存储中序遍历值及其索引，方便查找
+    unordered_map<int, int> inorder_map_;
 };
 
 int main() {

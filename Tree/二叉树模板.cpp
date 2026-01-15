@@ -8,7 +8,7 @@
 using namespace std;
 
 class BinaryTree {
-public:
+private:
     struct TreeNode {
         int val;
         TreeNode* left;
@@ -21,8 +21,7 @@ public:
     };
 
 public:
-    BinaryTree()
-        : root(nullptr) {
+    BinaryTree() {
         buildTree(root);
     }
 
@@ -36,6 +35,36 @@ public:
 
     void printPreorder() {
         printPreorder(root);
+    }
+
+    // 删除子树
+    // 子树被删除后，必须保证其父结点的对应指向设为nullptr
+    bool deleteSubtree(int val) {
+        TreeNode* parent_of_del = findParent(root, val);
+        if (parent_of_del == nullptr) {
+            // 特例：根节点被删除
+            if (root != nullptr && root->val == val) {
+                makeEmpty(root);
+                return true;
+            } else {
+                return false;
+            }
+        }
+        // 找到待删除子树是左子树还是右子树，断开父节点指向
+        // 注意时刻加上判空条件
+        TreeNode* to_del = nullptr;
+        if (parent_of_del->left != nullptr && parent_of_del->left->val == val) {
+            to_del = parent_of_del->left;
+            parent_of_del->left = nullptr;
+        } else if (parent_of_del->right != nullptr && parent_of_del->right->val == val) {
+            to_del = parent_of_del->right;
+            parent_of_del->right = nullptr;
+        }
+        if (to_del != nullptr) {
+            makeEmpty(to_del);
+            return true;
+        }
+        return false;
     }
 
 private:
@@ -66,6 +95,7 @@ private:
             t = nullptr;
             return;
         }
+        
         t = new TreeNode(stoi(val));
         buildTree(t->left);
         buildTree(t->right);
@@ -79,6 +109,21 @@ private:
         cout << t->val << ' ';
         printPreorder(t->left);
         printPreorder(t->right);
+    }
+
+    TreeNode* findParent(TreeNode* t, int val) {
+        if (t == nullptr) {
+            return nullptr;
+        }
+
+        if ((t->left != nullptr && t->left->val == val) || (t->right != nullptr && t->right->val == val)) {
+            return t;
+        }
+        TreeNode* left_res = findParent(t->left, val);
+        if (left_res != nullptr) {
+            return left_res;
+        }
+        return findParent(t->right, val);
     }
 
 private:
